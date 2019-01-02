@@ -8,7 +8,13 @@ export class HomeComponent extends React.Component {
     this.state = {
       initialPosts:[],
       finalPosts:[],
-      error:null,    };
+      error:null,
+      showAddForm: false,
+      form:{
+        title:'',
+        body:'',
+      }
+     };
   }
 
   componentDidMount(){
@@ -21,15 +27,18 @@ export class HomeComponent extends React.Component {
     })
   }
 
-  // componentWillReceiveProps(nextProps){
-  //   if(this.props.posts !== nextProps.posts){
-  //     this.setState({initialPosts:nextProps.posts.data,finalPosts:nextProps.posts.data})
-  //   }
-  // }
+  submitFormHandler = (e) => {
+    e.preventDefault();
+    Service.submitAddForm(this.state.form).then(response => {
+      console.log('success',response);
+    }).catch(error => {
+      console.log('error',error);
+      this.setState({error:error.message});
+    });
+  }
 
   changehandler = (e) => {
     let updatedPosts = this.state.initialPosts;
-    console.log(e.target.value,updatedPosts);
     updatedPosts = updatedPosts.filter(post => {
       return post.title.includes(e.target.value);
 
@@ -48,12 +57,44 @@ export class HomeComponent extends React.Component {
     console.log(id);
   }
 
+  handleChange = (e)=> {
+    var form = this.state.form;
+    form[e.target.name] = e.target.value;
+    this.setState({form:form});
+  }
+
+  addPostHandler = () => {
+    this.setState({showAddForm:true});
+  }
+
+  // submitFormHandler = (e) => {
+  //   e.preventDefault();
+  //   this.props.submitAddForm(this.state.form);
+  // }
+
   render(){
     const errorMsg = this.state.error
     return (
       <div>
         <h2>HomeComponent Header</h2>
-        <div>Item Counts : <span  className="font-weight-bold">{this.state.finalPosts.length}</span></div>
+        <div>
+          Item Counts : <span  className="font-weight-bold">{this.state.finalPosts.length}</span>
+          <button onClick={this.addPostHandler}  type="button" className="btn btn-primary float-right mb-2">Add Post</button>
+        </div>
+        {this.state.showAddForm &&
+        <div className="">
+          <form onSubmit={this.handleSubmit}>
+            <div className="form-group">
+              <label>Title:</label>
+              <input type="text" name='title' className="form-control" value={this.state.form.title} onChange={this.handleChange} />
+            </div>
+            <div className="form-group">
+              <label>Body:</label>
+              <input type="text" name='body' className="form-control" value={this.state.form.body} onChange={this.handleChange} />
+            </div>
+            <input type="submit" value="Submit" className="btn btn-primary" onClick={this.submitFormHandler} />
+          </form>
+        </div>}
         <div className="input-group mb-3">
           <div className="input-group-prepend">
             <span className="input-group-text" id="basic-addon1">Search</span>
