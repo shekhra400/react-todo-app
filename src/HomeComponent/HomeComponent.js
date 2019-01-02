@@ -1,6 +1,8 @@
 import React from "react";
 import PropTypes from 'prop-types';
 import Service from "../services";
+import { Link, Route } from 'react-router-dom';
+import PostComponent from '../PostComponent/PostComponent';
 
 export class HomeComponent extends React.Component {
   constructor(props){
@@ -19,7 +21,6 @@ export class HomeComponent extends React.Component {
 
   componentDidMount(){
     Service.getPostsApiData().then((posts) => {
-      console.log(posts);
       this.setState({initialPosts:posts.data,finalPosts:posts.data})
     }).catch((error) => {
       console.log('errors',error.message);
@@ -67,11 +68,6 @@ export class HomeComponent extends React.Component {
     this.setState({showAddForm:true});
   }
 
-  // submitFormHandler = (e) => {
-  //   e.preventDefault();
-  //   this.props.submitAddForm(this.state.form);
-  // }
-
   render(){
     const errorMsg = this.state.error
     return (
@@ -106,10 +102,12 @@ export class HomeComponent extends React.Component {
           {errorMsg}
         </div>}
         <div className="container">
-          <ul className="list-group text-left row">
+        <div className="row">
+          <ul className="list-group text-left col-md-6">
             {
               this.state.finalPosts.map((item,index) => {
-                return (<li className="list-group-item" key={item.id}>{item.title}
+                return (<li className="list-group-item" key={item.id}>
+                    <Link className="" to={'/posts/'+item.id}>{item.title}</Link>
                     <button onClick={() => this.deleteHandler(item.id)} type="button" className="close" aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -117,6 +115,10 @@ export class HomeComponent extends React.Component {
               })
             }
           </ul>
+          <div className="col-md-6">
+              <Route exact path='/posts/:id' component={PostComponent}/>
+            </div>
+          </div>
           </div>
       </div>
     )
